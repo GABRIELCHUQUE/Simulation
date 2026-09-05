@@ -1,5 +1,6 @@
 package Organismos;
 
+import Mundo.World;
 import Objetos.Gen;
 
 import java.util.HashMap;
@@ -60,6 +61,13 @@ public abstract class Lifeform {
         }
     }
 
+    protected void addEnergy(int amount) {
+        int added = Math.min(genes.get(Gen.MAX_ENERGY) - energy,amount);
+        energy += added;
+        amount -= added;
+        reserve += amount;
+    }
+
     protected boolean hasEnergy(int amount) {
         return energy + reserve >= amount;
     }
@@ -79,12 +87,15 @@ public abstract class Lifeform {
     }
 
     protected void grow() {
-        growth += genes.get(Gen.GROW_FACTOR);
+        int growFactor = genes.get(Gen.GROW_FACTOR);
+        if (!hasEnergy(growFactor)) return;
+        useEnergy(growFactor);
+        growth += growFactor;
     }
 
     public abstract void reproduction();
 
-    public abstract void turn();
+    public abstract void turn(World world, int col, int row);
 
     /// Getters
     public Map<Gen, Integer> getGenes() {
