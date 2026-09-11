@@ -27,7 +27,7 @@ public class Square {
 
     /// Setters
     public void setHumidity(int humidity) {
-        this.humidity = humidity;
+        this.humidity = Math.max(0,humidity);
     }
 
     public void setContent(Object content) {
@@ -36,5 +36,12 @@ public class Square {
 
     public void setTypeOfTerrain(Terrain typeOfTerrain) {
         this.typeOfTerrain = typeOfTerrain;
+    }
+
+    /// toString
+    public String contentView() {
+        boolean isNull = content == null;
+        return String.format("[%s]",
+                isNull ? " " : content.toString());
     }
 }

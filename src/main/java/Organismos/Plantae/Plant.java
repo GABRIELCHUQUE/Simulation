@@ -3,16 +3,19 @@ package Organismos.Plantae;
 import Mundo.Square;
 import Mundo.World;
 import Objetos.Gen;
+import Objetos.GenesTemplates;
 import Organismos.Lifeform;
 
 import java.util.Map;
 
 public class Plant extends Lifeform {
     /// Constructors
-    public Plant(int energy) {
-        super(energy);
-        genes.put(Gen.PHOTO_EFFICIENCY,2);
-        genes.put(Gen.LIGHT_RESISTANCE,80);
+    public Plant() {
+        super(GenesTemplates.plantTemplate());
+    }
+
+    public Plant(Map<Gen, Integer> genes) {
+        super(genes);
     }
 
     public Plant(Map<Gen, Integer> genes, int energy) {
@@ -20,15 +23,27 @@ public class Plant extends Lifeform {
     }
 
     /// Funciones específicas
-    protected void photosynthesis(int light, int water) {
+    protected int photosynthesis(int light, int water) {
+        // Posible daño por luz
+        int lightResistance = genes.get(Gen.LIGHT_RESISTANCE);
+        if (light > lightResistance) health -= (double) (light - lightResistance) /10;
+
+        // Posible daño por agua
+        int waterResistance = genes.get(Gen.RESISTANCE_WATER);
+        if (water > waterResistance) health -= (double) (water - waterResistance)/10;
+
+        // Sin recursos
+        int usable = Math.min(genes.get(Gen.QUOTA_WATER),water);
+        if (usable <= 0 || light <= 0) return 0;
+
+        // Obtención de energía
         double lightFactor = light/100.0;
-        double waterFactor = water/100.0;
-        int energy = (int) Math.ceil(genes.get(Gen.PHOTO_EFFICIENCY)
-                *lightFactor*waterFactor);
+        double waterFactor = Math.min(1,(double) usable/genes.get(Gen.QUOTA_WATER));
+        int energy = (int) Math.ceil(genes.get(Gen.PHOTO_EFFICIENCY)*
+                lightFactor*waterFactor*getAgeFactor());
+
         addEnergy(energy);
-        if (light > genes.get(Gen.LIGHT_RESISTANCE)) {
-            health -= (light - genes.get(Gen.LIGHT_RESISTANCE))/10;
-        }
+        return usable;
     }
 
     /// Funciones globales
@@ -39,13 +54,20 @@ public class Plant extends Lifeform {
 
     @Override
     public void turn(World world, int col, int row) {
-        metabolism();
+        metabolism(world.getLight() > 0);
 
         Square position = world.getSquare(col,row);
-        photosynthesis(world.getLight(),position.getHumidity());
-        if (health < genes.get(Gen.MAX_HEALTH))
-            curation();
-        if ((double) energy / genes.get(Gen.MAX_ENERGY) > 0.5)
-            grow();
+        int waterUsed = photosynthesis(world.getLight(),position.getHumidity());
+        if (waterUsed > 0) position.setHumidity(position.getHumidity() - waterUsed);
+
+        if (health < genes.get(Gen.MAX_HEALTH)) curation();
+        if ((isGrowing()) && ((double) energy / genes.get(Gen.MAX_ENERGY) > 0.9)) grow();
+        age++;
+    }
+
+    /// toString
+    @Override
+    public String toString() {
+        return "Plant";
     }
 }
