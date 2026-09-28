@@ -1,18 +1,30 @@
 package Mundo;
 
 public class Square {
+    private final int row;
+    private final int column;
     private int humidity;
     private Object content;
     private Terrain typeOfTerrain;
 
     /// Constructor
-    public Square(int humidity, Object content, Terrain typeOfTerrain) {
+    public Square(int row, int column, int humidity, Object content, Terrain typeOfTerrain) {
+        this.row = row;
+        this.column = column;
         this.humidity = humidity;
         this.content = content;
         this.typeOfTerrain = typeOfTerrain;
     }
 
     /// Getters
+    public int getRow() {
+        return row;
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
     public int getHumidity() {
         return humidity;
     }

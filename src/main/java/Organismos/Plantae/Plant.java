@@ -53,16 +53,16 @@ public class Plant extends Lifeform {
     }
 
     @Override
-    public void turn(World world, int col, int row) {
-        metabolism(world.getLight() > 0);
+    public void turn() {
+        World world = World.getWorld();
+        Square position = world.getSquare(this);
 
-        Square position = world.getSquare(col,row);
+        metabolism(world.getLight() > 0);
         int waterUsed = photosynthesis(world.getLight(),position.getHumidity());
         if (waterUsed > 0) position.setHumidity(position.getHumidity() - waterUsed);
 
         if (health < genes.get(Gen.MAX_HEALTH)) curation();
         if ((isGrowing()) && ((double) energy / genes.get(Gen.MAX_ENERGY) > 0.9)) grow();
-        age++;
     }
 
     /// toString

@@ -120,7 +120,7 @@ public abstract class Lifeform {
         } return squares.toArray(new Square[0]);
     }
 
-    public abstract void turn(World world, int col, int row);
+    public abstract void turn();
 
     public abstract void reproduction();
 
@@ -132,6 +132,10 @@ public abstract class Lifeform {
     public boolean isGrowing() {
         return growth < genes.
                 get(Gen.MATURITY);
+    }
+
+    public void growOld() {
+        age++;
     }
 
     protected double getAgeFactor() {

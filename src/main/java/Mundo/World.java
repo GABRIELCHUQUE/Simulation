@@ -2,26 +2,34 @@ package Mundo;
 
 import Organismos.Lifeform;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class World {
-    /// Atributos
-    static public final int hours = 24;
+    /// Mundo
+    static private World world = null;
+    static private final int hours = 24;
 
     private int light;
     private int currentHour;
     private final Square[][] squares;
+    private final Map<Lifeform,Square> lifeforms;
 
     /// Constructor
-    public World(int cols, int rows) {
+    private World(int cols, int rows) {
         this.light = 120;
         this.currentHour = 12;
         this.squares = new Square[rows][cols];
+        this.lifeforms = new HashMap<>();
         initialize();
     }
 
     private void initialize() {
         for (int row = 0; row < squares.length; row++) {
             for (int col = 0; col < squares[row].length; col++) {
-                squares[row][col] = new Square(20,null,
+                squares[row][col] = new Square(col,row,20,null,
                         Terrain.EARTH);
             }
         }
@@ -29,24 +37,12 @@ public class World {
 
     /// Funciones ambientales
     public void dayCycle() {
-        if (currentHour < 6 || currentHour >= 18) {
-            light = 0;
-        }
-        else if (currentHour < 9) {
-            light = (currentHour - 5) * 30;
-        }
-        else if (currentHour < 11) {
-            light = 100;
-        }
-        else if (currentHour < 13) {
-            light = 120;
-        }
-        else if (currentHour < 15) {
-            light = 100;
-        }
-        else {
-            light = (18 - currentHour) * 40;
-        }
+        if (currentHour < 6 || currentHour >= 18) {light = 0;}
+        else if (currentHour < 9) {light = (currentHour - 5) * 30;}
+        else if (currentHour < 11) {light = 100;}
+        else if (currentHour < 13) {light = 120;}
+        else if (currentHour < 15) {light = 100;}
+        else {light = (18 - currentHour) * 40;}
     }
 
     public void rain() {
@@ -79,6 +75,7 @@ public class World {
         Square square = getSquare(col,row);
         if (square.getContent() != null) return;
         square.setContent(lifeform);
+        lifeforms.put(lifeform,square);
     }
 
     public void printWorld() {
@@ -96,21 +93,16 @@ public class World {
 
     /// Turno
     public void turn() {
+        boolean endDay = (currentHour >= hours);
         dayCycle(); evaporation();
 
-        for (int row = 0; row < squares.length; row++) {
-            for (int col = 0; col < squares[row].length; col++) {
-                Square current = squares[row][col];
-                Object content = current.getContent();
-                if (content instanceof Lifeform) {
-                    Lifeform lifeform = (Lifeform) content;
-                    if (lifeform.isDead()) continue;
-                    ((Lifeform) content).turn(this,col,row);
-                }
-            }
+        List<Lifeform> auxLifeforms = new ArrayList<>(lifeforms.keySet());
+        for (Lifeform lifeform : auxLifeforms) {
+            lifeform.turn();
+            if (endDay) lifeform.growOld();
         }
 
-        currentHour++; if (currentHour >= hours) currentHour = 0;
+        currentHour++; if (endDay) currentHour = 0;
     }
 
     /// Getters
@@ -118,8 +110,22 @@ public class World {
         return light;
     }
 
+    public Square getSquare(Lifeform lifeform) {
+        if (!lifeforms.containsKey(lifeform)) return null;
+        return lifeforms.get(lifeform);
+    }
+
     public Square getSquare(int col, int row) {
         if (exists(col,row)) return squares[row][col];
         return null;
+    }
+
+    public static World getWorld() {
+        return getWorld(100,70);
+    }
+
+    public static World getWorld(int cols, int rows) {
+        if (world == null) {world = new World(cols,rows);}
+        return world;
     }
 }

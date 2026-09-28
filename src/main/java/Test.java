@@ -5,15 +5,13 @@ import Organismos.Plantae.Plant;
 
 public class Test {
     public static void main(String[] args) {
-        World world = new World(5,5);
+        World world = World.getWorld(4,4);
         Plant plant = new Plant();
 
-        Square square = world.getSquare(2,2);
-
         world.insertLifeform(plant,2,2);
-
-
         world.printWorld(); System.out.println("-----------------");
+        Square square = world.getSquare(plant);
+
         for (int i = 0; i < 200; i++) {
             if (i % 7 == 0) world.rain();
             System.out.println("Turno " + (i+1));
