@@ -18,4 +18,6 @@ public enum Gen {
     RESISTANCE_WATER,
     QUOTA_WATER
 
+
+
 }

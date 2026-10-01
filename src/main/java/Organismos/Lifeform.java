@@ -1,6 +1,6 @@
 package Organismos;
 
-import Mundo.Square;
+import Mundo.Tile;
 import Mundo.World;
 import Objetos.Gen;
 
@@ -11,8 +11,8 @@ import java.util.Map;
 public abstract class Lifeform {
     /// Atributos
     protected Map<Gen, Integer> genes;
-    protected int energy;
-    protected int reserve;
+    protected double energy;
+    protected double reserve;
     protected double health;
     protected int growth;
     protected int radius;
@@ -35,11 +35,11 @@ public abstract class Lifeform {
     }
 
     /// Funciones de energía
-    protected boolean hasEnergy(int amount) {
+    protected boolean hasEnergy(double amount) {
         return energy + reserve >= amount;
     }
 
-    protected void consumeEnergy(int amount) {
+    protected void consumeEnergy(double amount) {
         if (hasEnergy(amount)) {
             amount = useEnergy(amount);
             if (amount > 0) useReserves(amount);
@@ -50,7 +50,7 @@ public abstract class Lifeform {
         }
     }
 
-    protected void consumeReserves(int amount) {
+    protected void consumeReserves(double amount) {
         if (hasEnergy(amount)) {
             amount = useReserves(amount);
             if (amount > 0) useEnergy(amount);
@@ -61,22 +61,22 @@ public abstract class Lifeform {
         }
     }
 
-    protected int useEnergy(int amount) {
-        int consumed = Math.min(energy, amount);
+    protected double useEnergy(double amount) {
+        double consumed = Math.min(energy, amount);
         energy -= consumed;
         amount -= consumed;
         return amount;
     }
 
-    protected int useReserves (int amount) {
-        int consumed = Math.min(reserve,amount);
+    protected double useReserves (double amount) {
+        double consumed = Math.min(reserve,amount);
         reserve -= consumed;
         amount -= consumed;
         return amount;
     }
 
-    protected void addEnergy(int amount) {
-        int added = Math.min(genes.get(Gen.MAX_ENERGY) - energy,amount);
+    protected void addEnergy(double amount) {
+        double added = Math.min(genes.get(Gen.MAX_ENERGY) - energy,amount);
         energy += added;
         amount -= added;
         reserve += amount;
@@ -84,8 +84,8 @@ public abstract class Lifeform {
 
     /// Funciones metabólicas
     protected void metabolism(boolean currentEnergy) {
-        if (currentEnergy) consumeEnergy(genes.get(Gen.QUOTA_ENERGY));
-        else consumeReserves(genes.get(Gen.QUOTA_ENERGY));
+        if (currentEnergy) consumeEnergy(getQuota());
+        else consumeReserves(getQuota());
     }
 
     protected void curation() {
@@ -94,8 +94,8 @@ public abstract class Lifeform {
             double factor = Math.min(genes.get(Gen.CURATION_FACTOR),
                     genes.get(Gen.MAX_HEALTH) - health);
 
-            if (!hasEnergy((int) Math.ceil(factor))) return;
-            consumeReserves((int) Math.ceil(factor));
+            if (!hasEnergy(factor)) return;
+            consumeReserves(factor);
             health += factor;
         }
     }
@@ -107,19 +107,12 @@ public abstract class Lifeform {
         growth += growFactor;
     }
 
-    /// Funciones de acción
-    public Square[] adjacentSquares(World world, int col, int row) {
-        List<Square> squares = new ArrayList<>();
-        for (int i = -radius; i <= radius ; i++) {
-            for (int j = -radius; j <= radius ; j++) {
-                int auxCol = col+i; int auxRow = row+j;
-                if (auxCol == col && auxRow == row) continue;
-                if (!world.exists(auxCol,auxRow)) continue;
-                squares.add(world.getSquare(auxCol,auxRow));
-            }
-        } return squares.toArray(new Square[0]);
+    protected double getQuota() {
+        return genes.
+                get(Gen.QUOTA_ENERGY);
     }
 
+    /// Funciones de acción
     public abstract void turn();
 
     public abstract void reproduction();
@@ -148,10 +141,10 @@ public abstract class Lifeform {
     /// Getters
     public String getStatus() {
         return String.format(
-                "Health: %.1f/%d | Energy: %d/%d | Reserve: %d | Growth: %d |Edad: %d | Quota: %d",
+                "Health: %.1f/%d | Energy: %.0f/%d | Reserve: %.0f | Growth: %d |Edad: %d | Quota: %.2f",
                 health, genes.get(Gen.MAX_HEALTH),
                 energy, genes.get(Gen.MAX_ENERGY),
-                reserve, growth, age, genes.get(Gen.QUOTA_ENERGY)
+                reserve, growth, age, getQuota()
         );
     }
 }

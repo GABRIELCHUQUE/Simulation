@@ -1,6 +1,7 @@
 package Mundo;
 
 import Organismos.Lifeform;
+import Organismos.Plantas.Plant;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,23 +15,23 @@ public class World {
 
     private int light;
     private int currentHour;
-    private final Square[][] squares;
-    private final Map<Lifeform,Square> lifeforms;
+    private final Tile[][] tiles;
+    private final Map<Lifeform, Tile> lifeforms;
 
     /// Constructor
     private World(int cols, int rows) {
         this.light = 120;
         this.currentHour = 12;
-        this.squares = new Square[rows][cols];
+        this.tiles = new Tile[rows][cols];
         this.lifeforms = new HashMap<>();
         initialize();
     }
 
     private void initialize() {
-        for (int row = 0; row < squares.length; row++) {
-            for (int col = 0; col < squares[row].length; col++) {
-                squares[row][col] = new Square(col,row,20,null,
-                        Terrain.EARTH);
+        for (int row = 0; row < tiles.length; row++) {
+            for (int col = 0; col < tiles[row].length; col++) {
+                tiles[row][col] = new Tile(col,row,20,
+                        Terrain.EARTH,null,null);
             }
         }
     }
@@ -46,49 +47,52 @@ public class World {
     }
 
     public void rain() {
-        for (Square[] square : squares) {
-            for (Square current : square) {
-                current.setHumidity(current.getHumidity() + 10);
+        for (Tile[] tile : tiles) {
+            for (Tile current : tile) {
+                current.setHumidity(current.getHumidity() + 10.0);
             }
         }
     }
 
     public void evaporation() {
-        for (Square[] square : squares) {
-            for (Square current : square) {
-                current.setHumidity(current.getHumidity() - light/40);
+        for (Tile[] tile : tiles) {
+            for (Tile current : tile) {
+                current.setHumidity(current.getHumidity() - light/40.0);
             }
         }
     }
 
     /// Funciones técnicas
     public void insertLifeform(Lifeform lifeform) {
-        int row = (int) (Math.random() * squares.length);
-        int col = (int) (Math.random() * squares[0].length);
+        int row = (int) (Math.random() * tiles.length);
+        int col = (int) (Math.random() * tiles[0].length);
         insertLifeform(lifeform,row,col);
     }
 
     public void insertLifeform(Lifeform lifeform, int row, int col) {
         if (row < 0 || col < 0) return;
-        if (row >= squares.length || col >= squares[0].length) return;
+        if (row >= tiles.length || col >= tiles[0].length) return;
 
-        Square square = getSquare(col,row);
-        if (square.getContent() != null) return;
-        square.setContent(lifeform);
-        lifeforms.put(lifeform,square);
+        Tile tile = getTile(col,row);
+        if (tile.getContent() != null) return;
+        tile.setContent(lifeform);
+        lifeforms.put(lifeform, tile);
+
+        if (lifeform instanceof Plant)
+            ((Plant) lifeform).takeFirstRoot();
     }
 
     public void printWorld() {
-        for (Square[] square : squares) {
-            for (Square current : square) {
+        for (Tile[] tile : tiles) {
+            for (Tile current : tile) {
                 System.out.print(current.contentView() + " ");
             } System.out.println(" ");
         }
     }
 
     public boolean exists(int col, int row) {
-        return row >= 0 && row < squares.length
-                && col >= 0 && col < squares[0].length;
+        return row >= 0 && row < tiles.length
+                && col >= 0 && col < tiles[0].length;
     }
 
     /// Turno
@@ -106,17 +110,26 @@ public class World {
     }
 
     /// Getters
+    public double averageHumidity() {
+        double total = 0; int size = 0;
+        for (Tile[] tile : tiles) {
+            for (Tile current : tile) {
+                total += current.getHumidity(); size++;
+            }
+        } return total/size;
+    }
+
     public int getLight() {
         return light;
     }
 
-    public Square getSquare(Lifeform lifeform) {
+    public Tile getTile(Lifeform lifeform) {
         if (!lifeforms.containsKey(lifeform)) return null;
         return lifeforms.get(lifeform);
     }
 
-    public Square getSquare(int col, int row) {
-        if (exists(col,row)) return squares[row][col];
+    public Tile getTile(int col, int row) {
+        if (exists(col,row)) return tiles[row][col];
         return null;
     }
 

@@ -1,19 +1,24 @@
 package Mundo;
 
-public class Square {
+public class Tile {
+    /// Atributos
     private final int row;
     private final int column;
-    private int humidity;
-    private Object content;
+
+    private double humidity;
     private Terrain typeOfTerrain;
 
+    private Object content;
+    private Object underground;
+
     /// Constructor
-    public Square(int row, int column, int humidity, Object content, Terrain typeOfTerrain) {
+    public Tile(int row, int column, double humidity, Terrain typeOfTerrain, Object content, Object underground) {
         this.row = row;
         this.column = column;
         this.humidity = humidity;
-        this.content = content;
         this.typeOfTerrain = typeOfTerrain;
+        this.content = content;
+        this.underground = underground;
     }
 
     /// Getters
@@ -25,7 +30,7 @@ public class Square {
         return column;
     }
 
-    public int getHumidity() {
+    public double getHumidity() {
         return humidity;
     }
 
@@ -33,17 +38,25 @@ public class Square {
         return content;
     }
 
+    public Object getUnderground() {
+        return underground;
+    }
+
     public Terrain getTypeOfTerrain() {
         return typeOfTerrain;
     }
 
     /// Setters
-    public void setHumidity(int humidity) {
+    public void setHumidity(double humidity) {
         this.humidity = Math.max(0,humidity);
     }
 
     public void setContent(Object content) {
         this.content = content;
+    }
+
+    public void setUnderground(Object underground) {
+        this.underground = underground;
     }
 
     public void setTypeOfTerrain(Terrain typeOfTerrain) {
