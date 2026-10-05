@@ -50,8 +50,8 @@ public class Plant extends Lifeform {
     }
 
     public void takeFirstRoot() {
-        consumeEnergy(rootSystem.takeFirstRoot
-                (World.getWorld().getTile(this)));
+        consumeEnergy(rootSystem.takeRoot
+                (null,World.getWorld().getTile(this),10));
     }
 
     /// Alteraciones
@@ -70,7 +70,7 @@ public class Plant extends Lifeform {
     @Override
     public void turn() {
         // ELIMINAR RAICES MUERTAS
-        rootSystem.lostRoots();
+        rootSystem.updateSystem();
 
         // FOTOSINTESIS
         World world = World.getWorld();
@@ -90,7 +90,7 @@ public class Plant extends Lifeform {
             int used = rootSystem.growRoots(budget);
             budget -= used;
 
-            if (rootSystem.averageIntegrity() > 80) {
+            if (rootSystem.getIntegrity() > 80) {
                 used += rootSystem.takeRoots(budget,
                         genes.get(Gen.RESISTANCE_WATER));
             } consumeReserves(used);

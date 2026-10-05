@@ -30,7 +30,7 @@ public class World {
     private void initialize() {
         for (int row = 0; row < tiles.length; row++) {
             for (int col = 0; col < tiles[row].length; col++) {
-                tiles[row][col] = new Tile(col,row,20,
+                tiles[row][col] = new Tile(row,col,20,
                         Terrain.EARTH,null,null);
             }
         }
@@ -78,8 +78,7 @@ public class World {
         tile.setContent(lifeform);
         lifeforms.put(lifeform, tile);
 
-        if (lifeform instanceof Plant)
-            ((Plant) lifeform).takeFirstRoot();
+        if (lifeform instanceof Plant) ((Plant) lifeform).takeFirstRoot();
     }
 
     public void printWorld() {
@@ -95,7 +94,7 @@ public class World {
                 && col >= 0 && col < tiles[0].length;
     }
 
-    /// Turno
+    /// Funciones de los turnos
     public void turn() {
         boolean endDay = (currentHour >= hours);
         dayCycle(); evaporation();
@@ -107,6 +106,18 @@ public class World {
         }
 
         currentHour++; if (endDay) currentHour = 0;
+    }
+
+    public Tile[] neighborTiles(int col, int row, int radius) {
+        List<Tile> tiles = new ArrayList<>();
+        for (int i = -1*radius; i <= radius ; i++) {
+            for (int j = -1*radius; j <= radius ; j++) {
+                int auxCol = col+i; int auxRow = row+j;
+                Tile neighbor = getTile(auxCol,auxRow);
+                if (neighbor == null) continue;
+                tiles.add(neighbor);
+            }
+        } return tiles.toArray(new Tile[0]);
     }
 
     /// Getters
