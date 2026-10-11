@@ -1,13 +1,9 @@
 package Organismos;
 
 import Algoritmos.Randomizer;
-import Mundo.Tile;
-import Mundo.World;
 import Objetos.Gen;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public abstract class Lifeform {
@@ -115,13 +111,13 @@ public abstract class Lifeform {
     }
 
     /// Funciones reproductivas
-    private Map<Gen,Integer> geneticReplication() {
+    protected Map<Gen,Integer> geneticReplication() {
         Map<Gen,Integer> copy = new HashMap<>();
         for (Gen gen: genes.keySet()) {
             int value = genes.get(gen);
             if (Randomizer.probability(0.20))
                 value += Randomizer.randomRange(-5,5);
-            copy.put(gen,value);
+            copy.put(gen,gen.clamp(value));
         } return copy;
     }
 

@@ -1,14 +1,12 @@
 package Estructuras.Plantas;
 
+import Algoritmos.Randomizer;
 import Estructuras_.GraphNode;
 import Estructuras_.GraphSystem;
 import Mundo.Tile;
 import Mundo.World;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RootSystem extends GraphSystem {
     /// Constructor
@@ -36,6 +34,14 @@ public class RootSystem extends GraphSystem {
     public void destroyRoot(Root root) {
         system.get(root).setUnderground(null);
         removeNode(root);
+    }
+
+    public void destroySystem() {
+        List<GraphNode> nodes = new ArrayList<>(system.keySet());
+        for (GraphNode node: nodes) {
+            Root root = (Root) node;
+            destroyRoot(root);
+        }
     }
 
     public void updateSystem() {
@@ -98,5 +104,30 @@ public class RootSystem extends GraphSystem {
             if (aux == null) aux = tile;
             if (tile.getHumidity() > aux.getHumidity()) aux = tile;
         } return aux;
+    }
+
+    /// Fragmentación
+    public RootSystem fragmentBranch() {
+        Root root = fragmentCandidate();
+        if (root == null) return null;
+
+        RootSystem newBranch = new RootSystem();
+        Tile location = system.get(root);
+        if (location == null) System.out.println("ERROR ADD CENTRAL"); //
+        newBranch.addCentralNode(root,location);
+        removeNode(root);
+        return newBranch;
+    }
+
+    private Root fragmentCandidate() {
+        if (system.size() <= 3) return null;
+        Set<Root> roots = new HashSet<>();
+        for (GraphNode node: system.keySet()) {
+            if (!(node instanceof Root)) continue;
+            Root aux = (Root) node;
+            if (aux.getConnections().size() != 1) continue;
+            if (aux == root) continue;
+            roots.add(aux);
+        } return Randomizer.choose(roots);
     }
 }

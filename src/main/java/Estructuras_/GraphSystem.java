@@ -3,6 +3,7 @@ package Estructuras_;
 import Mundo.Tile;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class GraphSystem {
@@ -17,12 +18,23 @@ public class GraphSystem {
     }
 
     /// Getters
+    public boolean isEmpty() {
+        return system.
+                isEmpty();
+    }
+
     public int getIntegrity() {
         int total = 0;
+        if (system.isEmpty()) return 0;
         for (GraphNode graphNode: system.keySet())
             total += graphNode.getIntegrity();
         return total/system.size();
 
+    }
+
+    public Tile getLocation() {
+        return system.
+                get(root);
     }
 
     public int size() {
@@ -48,9 +60,9 @@ public class GraphSystem {
 
     public void removeNode(GraphNode node) {
         if (!system.containsKey(node)) return;
-        for (GraphNode n: system.keySet()) {
-            if (n.contains(node)) n.removeEdge(node);
-        } node.isolateSelf(); system.remove(node);
+        for (GraphNode n: new HashSet<>(node.getConnections())) {
+            unlinkNodes(node,n);
+        } system.remove(node);
     }
 
     /// Funciones de conección

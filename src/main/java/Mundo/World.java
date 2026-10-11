@@ -81,6 +81,12 @@ public class World {
         if (lifeform instanceof Plant) ((Plant) lifeform).takeFirstRoot();
     }
 
+    public void killLifeform(Lifeform lifeform) {
+        Tile tile = lifeforms.get(lifeform);
+        tile.setContent(null);
+        lifeforms.remove(lifeform);
+    }
+
     public void printWorld() {
         for (Tile[] tile : tiles) {
             for (Tile current : tile) {
@@ -103,6 +109,7 @@ public class World {
         for (Lifeform lifeform : auxLifeforms) {
             lifeform.turn();
             if (endDay) lifeform.growOld();
+            if (lifeform.isDead()) killLifeform(lifeform);
         }
 
         currentHour++; if (endDay) currentHour = 0;
@@ -134,6 +141,10 @@ public class World {
         return light;
     }
 
+    public int getPopulation() {
+        return lifeforms.size();
+    }
+
     public Tile getTile(Lifeform lifeform) {
         if (!lifeforms.containsKey(lifeform)) return null;
         return lifeforms.get(lifeform);
@@ -142,6 +153,10 @@ public class World {
     public Tile getTile(int col, int row) {
         if (exists(col,row)) return tiles[row][col];
         return null;
+    }
+
+    public Map<Lifeform, Tile> getLifeforms() {
+        return lifeforms;
     }
 
     public static World getWorld() {

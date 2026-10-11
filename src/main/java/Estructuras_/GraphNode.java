@@ -23,6 +23,10 @@ public class GraphNode {
         return connections.contains(node);
     }
 
+    public Set<GraphNode> getConnections() {
+        return connections;
+    }
+
     /// Funciones
     public void addEdge(GraphNode node) {
         connections.add(node);
@@ -30,9 +34,5 @@ public class GraphNode {
 
     public void removeEdge(GraphNode node) {
         connections.remove(node);
-    }
-
-    public void isolateSelf() {
-        connections.clear();
     }
 }

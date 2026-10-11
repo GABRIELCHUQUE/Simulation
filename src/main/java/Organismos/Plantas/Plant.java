@@ -1,6 +1,7 @@
 package Organismos.Plantas;
 
 import Estructuras.Plantas.RootSystem;
+import Mundo.Tile;
 import Mundo.World;
 import Objetos.Gen;
 import Objetos.GenesTemplates;
@@ -28,6 +29,11 @@ public class Plant extends Lifeform {
         this.rootSystem = new RootSystem();
     }
 
+    public Plant(Map<Gen, Integer> genes, int energy, RootSystem rootSystem) {
+        super(genes, energy);
+        this.rootSystem = rootSystem;
+    }
+
     /// Funciones específicas
     protected double photosynthesis(int light, double water) {
         // Posible daño por luz
@@ -50,11 +56,19 @@ public class Plant extends Lifeform {
     }
 
     public void takeFirstRoot() {
+        if (!rootSystem.isEmpty()) return;
         consumeEnergy(rootSystem.takeRoot
                 (null,World.getWorld().getTile(this),10));
     }
 
     /// Alteraciones
+    @Override
+    public boolean isDead() {
+        boolean death = super.isDead();
+        if (death) rootSystem.destroySystem();
+        return death;
+    }
+
     @Override
     protected double getQuota() {
         return super.getQuota() +
@@ -64,7 +78,18 @@ public class Plant extends Lifeform {
     /// Funciones globales
     @Override
     public void reproduction() {
+        RootSystem rootSystem = this.rootSystem.fragmentBranch();
+        if (rootSystem == null) return;
 
+        int energy = 2*genes.get(Gen.MAX_ENERGY);
+        useReserves(energy);
+        Plant descendant = new Plant(
+                geneticReplication(),
+                energy, rootSystem);
+
+        Tile tile = rootSystem.getLocation();
+        World.getWorld().insertLifeform(descendant,
+                tile.getRow(),tile.getColumn());
     }
 
     @Override
@@ -94,6 +119,11 @@ public class Plant extends Lifeform {
                 used += rootSystem.takeRoots(budget,
                         genes.get(Gen.RESISTANCE_WATER));
             } consumeReserves(used);
+        }
+
+        // REPRODUCCIÓN
+        if (energy + reserve > genes.get(Gen.MAX_ENERGY) * 2) {
+            reproduction();
         }
     }
 
