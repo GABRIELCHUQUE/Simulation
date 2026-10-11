@@ -85,7 +85,8 @@ public class Plant extends Lifeform {
         useReserves(energy);
         Plant descendant = new Plant(
                 geneticReplication(),
-                energy, rootSystem);
+                0, rootSystem);
+        descendant.addEnergy(energy);
 
         Tile tile = rootSystem.getLocation();
         World.getWorld().insertLifeform(descendant,
