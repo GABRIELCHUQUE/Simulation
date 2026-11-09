@@ -1,6 +1,6 @@
 package Estructuras.Plantas;
 
-import Estructuras_.GraphNode;
+import Estructuras.Generales.GraphNode;
 import Mundo.Tile;
 
 public class Root extends GraphNode {
@@ -15,14 +15,14 @@ public class Root extends GraphNode {
     }
 
     public double collectWater(Tile tile, int waterResistance, int waterQuota) {
-        double water = tile.getHumidity();
+        double water = tile.getHumidityLv();
         if (water > waterResistance)
             integrity -= (int) Math.ceil ((water - waterResistance) / 10.0);
 
         double capacity = waterQuota * (integrity / 100.0);
 
         double collected = Math.min(capacity,water);
-        tile.setHumidity(water - collected);
+        tile.setHumidityLv(water - collected);
         return collected;
     }
 }

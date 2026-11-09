@@ -1,4 +1,4 @@
-package Estructuras_;
+package Estructuras.Generales;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -3,22 +3,28 @@ package Mundo;
 public class Tile {
     /// Atributos
     private final int row;
-    private final int column;
+    private final int col;
 
-    private double humidity;
-    private Terrain typeOfTerrain;
-
-    private Object content;
+    private Terrain typeofTerrain;
+    private double humidityLv;
     private Object underground;
+    private Object surface;
 
     /// Constructor
-    public Tile(int row, int column, double humidity, Terrain typeOfTerrain, Object content, Object underground) {
+    public Tile(Terrain typeofTerrain, int row, int col) {
         this.row = row;
-        this.column = column;
-        this.humidity = humidity;
-        this.typeOfTerrain = typeOfTerrain;
-        this.content = content;
-        this.underground = underground;
+        this.col = col;
+        this.typeofTerrain = typeofTerrain;
+        this.humidityLv = typeofTerrain.getHumidityLv();
+        this.underground = null;
+        this.surface = null;
+    }
+
+    /// Métodos
+    public String contentView() {
+        boolean isNull = surface == null;
+        return String.format("[%s]",
+                isNull ? " " : surface.toString());
     }
 
     /// Getters
@@ -26,47 +32,40 @@ public class Tile {
         return row;
     }
 
-    public int getColumn() {
-        return column;
+    public int getCol() {
+        return col;
     }
 
-    public double getHumidity() {
-        return humidity;
+    public Terrain getTypeofTerrain() {
+        return typeofTerrain;
     }
 
-    public Object getContent() {
-        return content;
+    public double getHumidityLv() {
+        return humidityLv;
     }
 
     public Object getUnderground() {
         return underground;
     }
 
-    public Terrain getTypeOfTerrain() {
-        return typeOfTerrain;
+    public Object getSurface() {
+        return surface;
     }
 
     /// Setters
-    public void setHumidity(double humidity) {
-        this.humidity = Math.max(0,humidity);
+    public void setTypeofTerrain(Terrain typeofTerrain) {
+        this.typeofTerrain = typeofTerrain;
     }
 
-    public void setContent(Object content) {
-        this.content = content;
+    public void setHumidityLv(double humidityLv) {
+        this.humidityLv = Math.max(0,humidityLv);
     }
 
     public void setUnderground(Object underground) {
         this.underground = underground;
     }
 
-    public void setTypeOfTerrain(Terrain typeOfTerrain) {
-        this.typeOfTerrain = typeOfTerrain;
-    }
-
-    /// toString
-    public String contentView() {
-        boolean isNull = content == null;
-        return String.format("[%s]",
-                isNull ? " " : content.toString());
+    public void setSurface(Object surface) {
+        this.surface = surface;
     }
 }

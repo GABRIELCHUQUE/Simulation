@@ -1,8 +1,8 @@
 package Estructuras.Plantas;
 
 import Algoritmos.Randomizer;
-import Estructuras_.GraphNode;
-import Estructuras_.GraphSystem;
+import Estructuras.Generales.GraphNode;
+import Estructuras.Generales.GraphSystem;
 import Mundo.Tile;
 import Mundo.World;
 
@@ -94,15 +94,15 @@ public class RootSystem extends GraphSystem {
 
     private Tile bestNeighborRoot(Root root, int waterResistance) {
         Tile aux = system.get(root);
-        Tile[] tiles = World.getWorld().neighborTiles
-                (aux.getColumn(),aux.getRow(),1);
+        Tile[] tiles = World.getWorld().getNeighborTiles
+                (aux.getRow(),aux.getCol(),1);
 
         aux = null;
         for (Tile tile : tiles) {
             if (tile.getUnderground() != null) continue;
-            if (tile.getHumidity() > waterResistance) continue;
-            if (aux == null) aux = tile;
-            if (tile.getHumidity() > aux.getHumidity()) aux = tile;
+            if (tile.getHumidityLv() > waterResistance) continue;
+            if (aux == null) {aux = tile; continue;}
+            if (tile.getHumidityLv() > aux.getHumidityLv()) aux = tile;
         } return aux;
     }
 

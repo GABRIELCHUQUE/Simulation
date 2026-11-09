@@ -1,4 +1,4 @@
-package Objetos;
+package Genes;
 
 import java.util.HashMap;
 import java.util.Map;

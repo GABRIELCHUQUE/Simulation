@@ -1,4 +1,4 @@
-package Estructuras_;
+package Estructuras.Generales;
 
 import Mundo.Tile;
 

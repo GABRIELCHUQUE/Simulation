@@ -1,4 +1,4 @@
-package Objetos;
+package Genes;
 
 public enum Gen {
     MAX_ENERGY(1, 100),

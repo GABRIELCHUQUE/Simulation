@@ -1,20 +1,21 @@
 package Organismos;
 
 import Algoritmos.Randomizer;
-import Objetos.Gen;
+import Genes.Gen;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Lifeform {
     /// Atributos
-    protected Map<Gen, Integer> genes;
+    protected Map<Gen,Integer> genes;
+
+    protected double health;
     protected double energy;
     protected double reserve;
-    protected double health;
-    protected int growth;
-    protected int radius;
-    protected int age;
+
+    private int growthProgress;
+    private int age;
 
     /// Constructor
     public Lifeform(Map<Gen, Integer> genes) {
@@ -22,109 +23,103 @@ public abstract class Lifeform {
         this.energy = genes.get(Gen.MAX_ENERGY);
         this.reserve = 0;
         this.health = genes.get(Gen.MAX_HEALTH);
-        this.growth = 0;
-        this.radius = 1;
+        this.growthProgress = 0;
         this.age = 0;
     }
 
-    public Lifeform(Map<Gen, Integer> genes, int energy) {
-        this (genes);
+    public Lifeform(Map<Gen, Integer> genes, double energy) {
+        this(genes);
         this.energy = energy;
     }
 
-    /// Funciones de energía
+    /// Turno
+    public abstract void turn();
+
+    /// Métodos energéticos
     protected boolean hasEnergy(double amount) {
         return energy + reserve >= amount;
     }
 
-    protected void consumeEnergy(double amount) {
-        if (hasEnergy(amount)) {
-            amount = useEnergy(amount);
-            if (amount > 0) useReserves(amount);
-        } else {
-            amount = useEnergy(amount);
-            amount = useReserves(amount);
-            health -= amount;
-        }
+    public double useEnergy(double amount) {
+        return useEnergy(amount,true);
     }
 
-    protected void consumeReserves(double amount) {
-        if (hasEnergy(amount)) {
-            amount = useReserves(amount);
-            if (amount > 0) useEnergy(amount);
-        } else {
-            amount = useReserves(amount);
-            amount = useEnergy(amount);
-            health -= amount;
-        }
+    public double useReserve(double amount) {
+        return useReserve(amount,true);
     }
 
-    protected double useEnergy(double amount) {
-        double consumed = Math.min(energy, amount);
-        energy -= consumed;
-        amount -= consumed;
-        return amount;
+    private double useEnergy(double amount, boolean callback) {
+        double used = amount;
+
+        double consumed = Math.min(energy,amount);
+        energy -= consumed; amount -= consumed;
+        if (amount == 0) return used;
+
+        if (callback) amount -= useReserve(amount,false);
+        if (amount > 0) health -= amount;
+        return used;
     }
 
-    protected double useReserves (double amount) {
+    private double useReserve(double amount, boolean callback) {
+        double used = amount;
+
         double consumed = Math.min(reserve,amount);
-        reserve -= consumed;
-        amount -= consumed;
-        return amount;
+        reserve -= consumed; amount -= consumed;
+        if (amount == 0) return used;
+
+        if (callback) amount -= useEnergy(amount,false);
+        if (amount > 0) health -= amount;
+        return used;
     }
 
-    protected void addEnergy(double amount) {
+    public void addEnergy(double amount) {
         double added = Math.min(genes.get(Gen.MAX_ENERGY) - energy,amount);
-        energy += added;
-        amount -= added;
-        reserve += amount;
+        energy += added; amount -= added; reserve += amount;
     }
 
-    /// Funciones metabólicas
-    protected void metabolism(boolean currentEnergy) {
-        if (currentEnergy) consumeEnergy(getQuota());
-        else consumeReserves(getQuota());
+    /// Métodos metabólicos
+    protected abstract void metabolism();
+
+    public double getQuota() {
+        return genes
+                .get(Gen.QUOTA_ENERGY);
     }
 
     protected void curation() {
-        double percent = energy / (double) genes.get(Gen.MAX_ENERGY);
-        if (percent > 0.7) {
-            double factor = Math.min(genes.get(Gen.CURATION_FACTOR),
-                    genes.get(Gen.MAX_HEALTH) - health);
+        double percent = energy / genes.get(Gen.MAX_ENERGY);
+        if (percent <= 0.7) return;
 
-            if (!hasEnergy(factor)) return;
-            consumeReserves(factor);
-            health += factor;
-        }
+        double factor = Math.min(genes.get(Gen.CURATION_FACTOR),
+                genes.get(Gen.MAX_HEALTH) - health);
+        if (!hasEnergy(factor)) return;
+
+        useReserve(factor);
+        health += factor;
     }
 
     protected void grow() {
         int growFactor = genes.get(Gen.GROW_FACTOR);
         if (!hasEnergy(growFactor)) return;
-        consumeReserves(growFactor);
-        growth += growFactor;
+        useReserve(growFactor);
+        growthProgress += growFactor;
     }
 
-    protected double getQuota() {
-        return genes.
-                get(Gen.QUOTA_ENERGY);
+    public void growOld() {
+        age++;
     }
 
-    /// Funciones reproductivas
-    protected Map<Gen,Integer> geneticReplication() {
+    /// Métodos reproductivos
+    protected Map<Gen,Integer> replicateGenes() {
         Map<Gen,Integer> copy = new HashMap<>();
         for (Gen gen: genes.keySet()) {
             int value = genes.get(gen);
-            if (Randomizer.probability(0.20))
+            if (Randomizer.probability(0.15))
                 value += Randomizer.randomRange(-5,5);
             copy.put(gen,gen.clamp(value));
         } return copy;
     }
 
-    /// Funciones de acción
-    public abstract void turn();
-
-    public abstract void reproduction();
+    protected abstract void reproduction();
 
     /// Otros
     public boolean isDead() {
@@ -132,12 +127,7 @@ public abstract class Lifeform {
     }
 
     public boolean isGrowing() {
-        return growth < genes.
-                get(Gen.MATURITY);
-    }
-
-    public void growOld() {
-        age++;
+        return growthProgress < genes.get(Gen.MATURITY);
     }
 
     protected double getAgeFactor() {
@@ -147,13 +137,12 @@ public abstract class Lifeform {
         return Math.exp(-0.02 * yearsOld);
     }
 
-    /// Getters
     public String getStatus() {
         return String.format(
                 "Health: %.1f/%d | Energy: %.0f/%d | Reserve: %.0f | Growth: %d |Edad: %d | Quota: %.2f",
                 health, genes.get(Gen.MAX_HEALTH),
                 energy, genes.get(Gen.MAX_ENERGY),
-                reserve, growth, age, getQuota()
+                reserve, growthProgress, age, getQuota()
         );
     }
 }
