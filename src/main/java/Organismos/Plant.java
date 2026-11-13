@@ -3,9 +3,10 @@ package Organismos;
 import Estados.Plantas.DayState;
 import Estados.Plantas.NightState;
 import Estados.Plantas.PlantState;
+import Estrategias.Reproduccion_P.Fragmentation;
+import Estrategias.Reproduccion_P.ReproducePlStrategy;
 import Estructuras.Plantas.RootSystem;
 
-import Mundo.Tile;
 import Mundo.World;
 import Genes.Gen;
 import Genes.GenesTemplates;
@@ -18,6 +19,7 @@ public class Plant extends Lifeform {
     public static final PlantState NIGHT_STATE = new NightState();
 
     /// Atributos
+    private final ReproducePlStrategy reproduction;
     private final RootSystem rootSystem;
     private PlantState state;
 
@@ -26,18 +28,21 @@ public class Plant extends Lifeform {
         super(GenesTemplates.plantTemplate());
         this.rootSystem = new RootSystem();
         this.state = new DayState();
+        this.reproduction = new Fragmentation();
     }
 
     public Plant(Map<Gen,Integer> genes, int energy) {
         super(genes, energy);
         this.rootSystem = new RootSystem();
         this.state = new DayState();
+        this.reproduction = new Fragmentation();
     }
 
     public Plant(Map<Gen,Integer> genes, int energy, RootSystem rootSystem) {
         super(genes, energy);
         this.rootSystem = rootSystem;
         this.state = new DayState();
+        this.reproduction = new Fragmentation();
     }
 
     /// Turno
@@ -107,18 +112,11 @@ public class Plant extends Lifeform {
     /// Métodos reproductivos
     @Override
     protected void reproduction() {
-        RootSystem rootSystem = this.rootSystem.fragmentBranch();
-        if (rootSystem == null) return;
+        reproduction.reproduction(this);
+    }
 
-        int energy = 2 * genes.get(Gen.MAX_ENERGY);
-        useReserve(energy);
-
-        Plant descendant = new Plant(replicateGenes(), 0,rootSystem);
-        descendant.addEnergy(energy);
-
-        Tile tile = rootSystem.getLocation();
-        World.getWorld().insertLifeform(descendant,
-                tile.getRow(),tile.getCol());
+    public RootSystem getRootSystem() {
+        return rootSystem;
     }
 
     /// Otros

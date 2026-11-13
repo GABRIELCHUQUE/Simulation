@@ -14,25 +14,26 @@ public class GraphNode {
         this.integrity = integrity;
     }
 
-    /// Basico
+    /// Getters
     public int getIntegrity() {
         return integrity;
-    }
-
-    public boolean contains(GraphNode node) {
-        return connections.contains(node);
     }
 
     public Set<GraphNode> getConnections() {
         return connections;
     }
 
-    /// Funciones
+    /// Métodos
     public void addEdge(GraphNode node) {
         connections.add(node);
     }
 
     public void removeEdge(GraphNode node) {
         connections.remove(node);
+    }
+
+    /// Otros
+    public boolean contains(GraphNode node) {
+        return connections.contains(node);
     }
 }

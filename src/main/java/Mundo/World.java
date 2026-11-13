@@ -76,6 +76,11 @@ public class World {
         lifeforms.remove(lifeform);
     }
 
+    public void updateLocation(Lifeform lifeform, Tile tile) {
+        if (lifeform == null || tile == null) return;
+        lifeforms.put(lifeform, tile);
+    }
+
     /// Métodos ambientales
     private void environmentalEffects() {
         evaporation();

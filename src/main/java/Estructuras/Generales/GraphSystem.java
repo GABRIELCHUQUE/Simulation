@@ -5,6 +5,7 @@ import Mundo.Tile;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class GraphSystem {
     /// Atributos
@@ -18,11 +19,6 @@ public class GraphSystem {
     }
 
     /// Getters
-    public boolean isEmpty() {
-        return system.
-                isEmpty();
-    }
-
     public int getIntegrity() {
         int total = 0;
         if (system.isEmpty()) return 0;
@@ -33,21 +29,18 @@ public class GraphSystem {
     }
 
     public Tile getLocation() {
-        return system.
-                get(root);
+        return system.get(root);
     }
 
-    public int size() {
-        return system.
-                size();
+    public Tile getLocation(GraphNode node) {
+        return system.get(node);
     }
 
-    public String infrastructure() {
-        return String.format("Tamaño: %d | Integridad: %d",
-                system.size(),getIntegrity());
+    public GraphNode getRoot() {
+        return root;
     }
 
-    /// Funciones de añadido
+    /// Métodos de añadido
     public void addCentralNode(GraphNode node, Tile tile) {
         addNode(node,tile);
         root = node;
@@ -84,5 +77,23 @@ public class GraphSystem {
         if (!system.containsKey(nodeA)) return;
         nodeA.removeEdge(nodeB);
         if (bidirectional) nodeB.removeEdge(nodeA);
+    }
+
+    /// Otros
+    public String infrastructure() {
+        return String.format("Tamaño: %d | Integridad: %d",
+                system.size(),getIntegrity());
+    }
+
+    public int size() {
+        return system.size();
+    }
+
+    public boolean isEmpty() {
+        return system.isEmpty();
+    }
+
+    public Set<GraphNode> keySet() {
+        return system.keySet();
     }
 }

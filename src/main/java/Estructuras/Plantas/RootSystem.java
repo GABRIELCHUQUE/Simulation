@@ -105,29 +105,4 @@ public class RootSystem extends GraphSystem {
             if (tile.getHumidityLv() > aux.getHumidityLv()) aux = tile;
         } return aux;
     }
-
-    /// Fragmentación
-    public RootSystem fragmentBranch() {
-        Root root = fragmentCandidate();
-        if (root == null) return null;
-
-        RootSystem newBranch = new RootSystem();
-        Tile location = system.get(root);
-        if (location == null) System.out.println("ERROR ADD CENTRAL"); //
-        newBranch.addCentralNode(root,location);
-        removeNode(root);
-        return newBranch;
-    }
-
-    private Root fragmentCandidate() {
-        if (system.size() <= 3) return null;
-        Set<Root> roots = new HashSet<>();
-        for (GraphNode node: system.keySet()) {
-            if (!(node instanceof Root)) continue;
-            Root aux = (Root) node;
-            if (aux.getConnections().size() != 1) continue;
-            if (aux == root) continue;
-            roots.add(aux);
-        } return Randomizer.choose(roots);
-    }
 }

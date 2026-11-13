@@ -3,11 +3,15 @@ package Organismos;
 import Algoritmos.Randomizer;
 import Genes.Gen;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Lifeform {
+    /// Estatico
+    private static final Set<Integer> IDS = new HashSet<>();
+
     /// Atributos
+    private final int id;
+
     protected Map<Gen,Integer> genes;
 
     protected double health;
@@ -19,6 +23,7 @@ public abstract class Lifeform {
 
     /// Constructor
     public Lifeform(Map<Gen, Integer> genes) {
+        this.id = generateId();
         this.genes = genes;
         this.energy = genes.get(Gen.MAX_ENERGY);
         this.reserve = 0;
@@ -109,7 +114,7 @@ public abstract class Lifeform {
     }
 
     /// Métodos reproductivos
-    protected Map<Gen,Integer> replicateGenes() {
+    public Map<Gen,Integer> replicateGenes() {
         Map<Gen,Integer> copy = new HashMap<>();
         for (Gen gen: genes.keySet()) {
             int value = genes.get(gen);
@@ -120,6 +125,14 @@ public abstract class Lifeform {
     }
 
     protected abstract void reproduction();
+
+    /// Métodos de identificación
+    private int generateId() {
+        while (true) {
+            int n = Randomizer.RANDOM.nextInt(Integer.MAX_VALUE);
+            if (IDS.add(n)) return n;
+        }
+    }
 
     /// Otros
     public boolean isDead() {
@@ -144,5 +157,9 @@ public abstract class Lifeform {
                 energy, genes.get(Gen.MAX_ENERGY),
                 reserve, growthProgress, age, getQuota()
         );
+    }
+
+    public Map<Gen, Integer> getGenes() {
+        return genes;
     }
 }

@@ -15,6 +15,8 @@ public enum Gen {
     RESISTANCE_WATER(0, 100),
     QUOTA_WATER(1, 10);
 
+
+
     private final int min;
     private final int max;
 

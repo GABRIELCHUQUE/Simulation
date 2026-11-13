@@ -2,9 +2,12 @@ package Algoritmos;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 public class Randomizer {
+    public static final Random RANDOM = new Random();
+
     public static <T> T choose(Set<T> set) {
         return choose(new ArrayList<>(set));
     }
