@@ -135,6 +135,11 @@ public abstract class Lifeform {
     }
 
     /// Otros
+    public double applyDamage(double damage) {
+        health -= damage;
+        return damage;
+    }
+
     public boolean isDead() {
         return health <= 0;
     }

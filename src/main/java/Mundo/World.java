@@ -129,8 +129,6 @@ public class World {
                 if (aux != null) tiles.add(aux);
             }
         } return tiles.toArray(new Tile[0]);
-
-
     }
 
     public Tile getTile(int row, int col) {

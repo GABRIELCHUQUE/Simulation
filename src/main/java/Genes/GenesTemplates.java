@@ -24,6 +24,19 @@ public class GenesTemplates {
         plantGenes.put(Gen.RESISTANCE_WATER,75);
         return plantGenes;
     }
+
+    public static Map<Gen,Integer> animalTemplate() {
+        Map<Gen,Integer> animalGenes = lucaTemplate();
+        animalGenes.put(Gen.MAX_ENERGY,50);
+        animalGenes.put(Gen.MAX_HYDRATION,50);
+        animalGenes.put(Gen.MAX_AWAKE_TIME,10);
+        animalGenes.put(Gen.DIET,500);
+        animalGenes.put(Gen.VISION_RANGE,4);
+        animalGenes.put(Gen.MOVEMENT_POINTS,1);
+        animalGenes.put(Gen.DIGESTION_EFFICIENCY,2000);
+        animalGenes.put(Gen.DIGESTION_COST,2);
+        return animalGenes;
+    }
 }
 
 

@@ -1,6 +1,7 @@
 import Mundo.Tile;
 import Mundo.World;
 
+import Organismos.Animal;
 import Organismos.Lifeform;
 import Organismos.Plant;
 
@@ -13,13 +14,18 @@ public class Test {
         world.insertLifeform(plant,2,2);
         world.printWorld(); System.out.println("-----------------");
 
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < 500; i++) {
             System.out.printf("FORMAS DE VIDA: %d\n", world.getPopulation());
             System.out.printf("Turno %d | Luz %d | Humedad %.2f\n",
                     (i+1),world.getLightLv(),world.getHumidityLv());
 
             for (Lifeform lifeform: world.getLifeforms())
                 {System.out.println(lifeform.getStatus());}
+
+            if (i == 400) {
+                Animal animal = new Animal();
+                world.insertLifeform(animal);
+            }
 
             world.turn();
             System.out.println("-----------------");
@@ -28,6 +34,6 @@ public class Test {
         world.printWorld(); System.out.println("-----------------");
 
         for (Lifeform lifeform: world.getLifeforms())
-            {System.out.println(lifeform.getStatus());}
+        {System.out.println(lifeform.getStatus());}
     }
 }
